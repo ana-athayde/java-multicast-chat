@@ -1,78 +1,47 @@
 # Multicast Chat
 
-Este é um aplicativo Java simples para conduzir bate-papo multicast usando MulticastSocket.
+A small command-line group chat written in Java. Participants join the same IP multicast group and UDP port to exchange messages directly; there is no central chat server.
 
-## Descrição
+## How It Works
 
-O aplicativo Multicast Chat permite que os usuários se comuniquem uns com os outros em um grupo de multicast. É uma implementação básica de um sistema de bate-papo usando soquetes Java.
+Each participant runs the application, enters a display name, and sends messages to the configured multicast group. A background thread listens for incoming datagrams and prints messages from other participants. Messages sent by the local participant are filtered out. Type `Exit` to leave the group and close the application.
 
-## Início
+The project contains two Java source files:
 
-### Pré-requisitos
+- `MulticastChat.java` starts the chat, joins the multicast group, reads user input, and sends messages.
+- `ReadThread.java` receives and displays messages in a separate thread.
 
-- Kit de Desenvolvimento Java (JDK)
-- Qualquer ambiente de desenvolvimento Java (Eclipse, IntelliJ, etc.) ou ferramentas de linha de comando
+## Requirements
 
-### Uso
+- Java Development Kit (JDK)
+- A network interface and network that support IP multicast
 
-1. Clone o repositório em sua máquina local.
+## Build and Run
 
-   ```bash
-   git clone https://github.com/ana-athayde/multicast_chat_java
-   ```
+From the project directory, compile both source files:
 
-2. Compile o código-fonte Java.
+```bash
+javac -d out MulticastChat.java ReadThread.java
+```
 
-   ```bash
-   javac MulticastChat.java
-   ```
+Run the application with a multicast group address and UDP port:
 
-3. Execute o aplicativo.
+```bash
+java -cp out multicastchat.MulticastChat <multicast-group> <port>
+```
 
-   ```bash
-   java MulticastChat <multicast-host> <server_port>
-   ```
+For example:
 
-4. Siga as instruções na tela para conversar com outros no grupo de multicast.
+```bash
+java -cp out multicastchat.MulticastChat 239.1.2.3 5000
+```
 
-## Configuração do Host Multicast e Porta do Servidor
+Start another instance using the same group address and port to join the same chat. The group address must be in the IPv4 multicast range (`224.0.0.0`–`239.255.255.255`), and the chosen UDP port must be available. Network configuration and firewalls must allow multicast traffic.
 
-Para usar o aplicativo Multicast Chat, é importante configurar corretamente o host de multicast (`<multicast-host>`) e a porta do servidor (`<server_port>`). Esses valores determinam como o aplicativo se conecta a um grupo de multicast para enviar e receber mensagens.
+## Network Scope
 
-### `<multicast-host>`
+The current implementation sets the multicast time-to-live (TTL) to `0`. As a result, packets are limited to the local host and will not be forwarded to other machines. To chat across computers, the TTL and network multicast configuration need to be adjusted.
 
-O valor de `<multicast-host>` representa o endereço IP do grupo de multicast ao qual você deseja que o aplicativo se junte. O endereço IP de multicast é um endereço especial reservado para comunicações de grupo. Certifique-se de usar um endereço IP de multicast válido dentro do intervalo reservado (por exemplo, entre 224.0.0.0 e 239.255.255.255).
+## Author
 
-### `<server_port>`
-
-O valor de `<server_port>` é o número da porta em que o servidor de multicast estará ouvindo e no qual os clientes (incluindo o seu aplicativo) se conectam para enviar e receber mensagens. É essencial escolher uma porta disponível e que não entre em conflito com outras portas em uso na sua rede.
-
-
-## Contribuição
-
-Se desejar contribuir para este projeto, crie uma solicitação de pull (pull request). Agradecemos quaisquer melhorias ou novos recursos.
-
-## Autor
-
-- [Ana Athayde](https://github.com/ana-athayde)
-
-## Agradecimentos
-
-- Este projeto é um exemplo simples do uso de MulticastSocket em Java.
-- Sinta-se à vontade para expandir e aprimorar este aplicativo conforme julgar apropriado.
-
-## Notas
-
-- O comando `Exit` pode ser usado para encerrar o bate-papo.
-
-## Arquivos do Projeto
-
-Aqui estão os principais arquivos do projeto:
-
-### MulticastChat.java
-
-O arquivo `MulticastChat.java` é a classe principal que inicia o aplicativo de bate-papo multicast. Ele lida com o envio de mensagens para o grupo multicast e recebe mensagens de outros participantes.
-
-### ReadThread.java
-
-O arquivo `ReadThread.java` contém a classe `ReadThread`, responsável por receber e processar as mensagens recebidas do grupo multicast. Ela assegura que as mensagens do próprio usuário não sejam repetidas.
+[Ana Athayde](https://github.com/ana-athayde)
